@@ -62,3 +62,16 @@ body {
 	font-family: "Press Start 2P";
 	font-size: 1.2rem;
 }
+
+.tetris-details > button:active {
+	background-color: red;
+}
+
+.tetromino {
+	background-color: red;
+}
+
+.taken {
+	background-color: blue;
+	/* border: 1px solid red; */
+}
