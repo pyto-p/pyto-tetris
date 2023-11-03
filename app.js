@@ -1,7 +1,9 @@
 const gridContainer = document.querySelector(".tetris-grid");
 const miniContainer = document.querySelector(".mini-grid");
 const startBtn = document.getElementById("start-btn");
+const resetBtn = document.getElementById("reset-btn");
 const scoreBoard = document.getElementById("score");
+const lvlBoard = document.getElementById("level");
 const widthContainer = 10;
 const heightContainer = 20;
 const colors = [
@@ -93,15 +95,12 @@ const nextTetrominoes = [
 ]
 
 let nextRandom = 0;
-let score = 0;
 let squares = Array.from(document.querySelectorAll(".tetris-grid div"));
 let blockPosition = 4;
 let currentRotation = 0;
 let timerID;
 let randomBlock = Math.floor(Math.random()*theTetrominoes.length);
 let current = theTetrominoes[randomBlock][currentRotation];
-let speed = 1000;
-let highScore = 10;
 
 function drawBlock() {
   current.forEach(index => {
@@ -204,19 +203,16 @@ function rotateBlock() {
   drawBlock();
 }
 
-function dropBlock() {
-  undrawBlock()
-  while (!current.some(index => squares[blockPosition + index + width].classList.contains("occupied"))) {
-    // blockPosition += 10
-    moveDown()
-  }
-  drawBlock();
-  stopBlock();
-}
-
+// function dropBlock() {
+//   undrawBlock()
+//   while (!current.some(index => squares[blockPosition + index + width].classList.contains("occupied"))) {
+//     moveDown()
+//   }
+//   drawBlock();
+//   stopBlock();
+// }
 
 function displayShape() {
-  //remove any trace of a tetromino form the entire grid
   displaySquares.forEach(square => {
     square.classList.remove('tetromino')
     square.style.backgroundColor = ''
@@ -227,25 +223,45 @@ function displayShape() {
   })
 }
 
+var score = 0;
+var speed = 1000;
+var highScore = 100;
+var level = 1;
+
 function addScore() {
   for (let i = 0; i < 199; i +=widthContainer) {
     const row = [i, i+1, i+2, i+3, i+4, i+5, i+6, i+7, i+8, i+9]
 
     if(row.every(index => squares[index].classList.contains('occupied'))) {
-      score += 10;
-      // levelUp(speed, highScore);
+      if (score >= highScore) {
+        level += 1;
+        highScore = highScore + 100;
+        speed = speed - 100;
+        clearInterval(timerID);
+        timerID = setInterval(moveDown, speed);
+      } else {
+        score += 10;
+      }
       scoreBoard.textContent = score;
+      lvlBoard.textContent = level;
       row.forEach(index => {
-        squares[index].classList.remove('occupied')
-        squares[index].classList.remove('tetromino')
-        squares[index].style.backgroundColor = ''
+        squares[index].classList.remove('occupied');
+        squares[index].classList.remove('tetromino');
+        squares[index].style.backgroundColor = '';
       })
-      const squaresRemoved = squares.splice(i, widthContainer)
-      squares = squaresRemoved.concat(squares)
-      squares.forEach(cell => gridContainer.appendChild(cell))
+      const squaresRemoved = squares.splice(i, widthContainer);
+      squares = squaresRemoved.concat(squares);
+      squares.forEach(cell => gridContainer.appendChild(cell));
     }
   }
 }
+
+// function levelUp(speed, highScore) {
+//   highScore = highScore + 100;
+//   speed = speed - 300;
+//   clearInterval(timerID);
+//   timerID = setInterval(moveDown, speed);
+// }
 
 function keyPresses(e) {
   if (e.key === 'ArrowUp') {
@@ -260,23 +276,22 @@ function keyPresses(e) {
     stopBlock3();
   }
 
-  if (e.code === "Space") {
-    dropBlock();
-  }
+  // if (e.code === "Space") {
+  //   dropBlock();
+  // }
 
   if (e.key === 'ArrowDown') {
     moveDown();
   }
 }
 
-document.addEventListener('keydown', keyPresses);
-
 function startPause() {
   if (timerID) {
     clearInterval(timerID)
-    timerID = null
+    timerID = null;
   } else {
     drawBlock()
+    document.addEventListener('keydown', keyPresses);
     timerID = setInterval(moveDown, speed);
     
     const displaySquaresArray = [...displaySquares];
@@ -289,64 +304,56 @@ function startPause() {
   }
 }
 
-startBtn.addEventListener('click', startPause);
-
 function gameOver() {
   if(current.some(index => squares[blockPosition + index].classList.contains('occupied'))) {
-    scoreBoard.textContent = 'end'
+    scoreBoard.textContent = 'end';
     clearInterval(timerID);
     document.removeEventListener('keydown', keyPresses);
     startBtn.removeEventListener('click', startPause);
   }
 }
 
-// function levelUp(speed, highScore) {
-//   if (speed >= highScore) {
-//     console.log("speed up");
-//     highScore = highScore + 100;
-//     speed = speed - 100;
-//     timerID = setInterval(moveDown, speed);
-//     console.log(highScore);
-//   }
-// }
-
-const resetBtn = document.getElementById("reset-btn");
 
 function resetGame() {
   for (let i = 0; i < 199; i +=widthContainer) {
-    const row = [i, i+1, i+2, i+3, i+4, i+5, i+6, i+7, i+8, i+9]
+    const row = [i, i+1, i+2, i+3, i+4, i+5, i+6, i+7, i+8, i+9];
 
     if(row.some(index => squares[index].classList.contains('tetromino'))) {
       row.forEach(index => {
-        squares[index].classList.remove('occupied')
-        squares[index].classList.remove('tetromino')
+        squares[index].classList.remove('occupied');
+        squares[index].classList.remove('tetromino');
         squares[index].style.backgroundColor = ''
       })
     }
     
     displaySquares.forEach(square => {
-      square.classList.remove('tetromino')
-      square.style.backgroundColor = ''
+      square.classList.remove('tetromino');
+      square.style.backgroundColor = '';
     })
 
-    clearInterval(timerID)
-    timerID = null
+    clearInterval(timerID);
     document.addEventListener('keydown', keyPresses);
     startBtn.addEventListener('click', startPause);
-    randomBlock = nextRandom
-    nextRandom = Math.floor(Math.random() * theTetrominoes.length)
+    
+    randomBlock = nextRandom;
+    nextRandom = Math.floor(Math.random() * theTetrominoes.length);
     currentRotation = 0;
-    current = theTetrominoes[randomBlock][currentRotation]
+    current = theTetrominoes[randomBlock][currentRotation];
     blockPosition = 4;
+    // drawBlock()
+
+    highScore = 100;
     score = 0;
     scoreBoard.textContent = score;
+    level = 1;
+    lvlBoard.textContent = level;
+    speed = 1000;
   }
 }
 
+startBtn.addEventListener('click', startPause);
 
-resetBtn.addEventListener('click', resetGame)
-// BUGS:
-// 1. Every two blocks nag p-pause pag inispace bar
-// 2. Kahit end game na, continuous pa rin nag poproduce ng blocks dapat hindi na
-//3. Reset button done
-//4. 
+resetBtn.addEventListener('click', () => {
+  resetGame();
+  startPause();
+})
