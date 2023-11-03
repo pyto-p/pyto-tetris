@@ -6,6 +6,7 @@
 
 body {
 	height: 100vh;
+	overflow: hidden;
 	display: flex;
 	/* flex-direction: column; */
 	justify-content: center;
@@ -31,8 +32,6 @@ body {
 	height: 700px;
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: center;
-	align-items: center;
 }
 
 .grid-children {
@@ -41,9 +40,11 @@ body {
 }
 
 .tetris-details {
+	height: 700px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	justify-content: start;
 	gap: 20px;
 }
 
@@ -67,11 +68,22 @@ body {
 	background-color: red;
 }
 
-.tetromino {
-	background-color: red;
+.mini-grid {
+	width: 200px;
+	height: 200px;
+	display: flex;
+	flex-wrap: wrap;
+	padding: 20px;
+	border: 5px solid black;
+	border-radius: 20px;
+	background-color: #c0bfbf;
 }
 
-.taken {
-	background-color: blue;
-	/* border: 1px solid red; */
+.mini-grid-children {
+	border: 1px solid #c0bfbf;
+	background-color: rgb(0, 0, 0);
+}
+
+.tetromino {
+	background-color: red;
 }
