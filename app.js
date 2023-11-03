@@ -289,6 +289,7 @@ function startPause() {
   if (timerID) {
     clearInterval(timerID)
     timerID = null;
+    document.removeEventListener('keydown', keyPresses);
   } else {
     drawBlock()
     document.addEventListener('keydown', keyPresses);
